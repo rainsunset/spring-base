@@ -1,10 +1,10 @@
 # spring5-base
-spring5源码解读
-
+spring5源码解读  
 [Spring Framework 官网](https://spring.io/projects/spring-framework)  
 [Spring Framework Github Wiki-English](https://github.com/spring-projects/spring-framework/blob/master/CONTRIBUTING.md)    
 [Spring Framework Github 中文文档](https://github.com/DocsHome/spring-docs/blob/master/SUMMARY.md)  
 [Spring Framework 源码-v5.2.13.RELEASE](https://github.com/spring-projects/spring-framework/tree/v5.2.13.RELEASE)
+
 
 ###Spring体系架构
 ####Spring体系架构(基于4.*)
@@ -21,6 +21,10 @@ Web Reactive|Spring WebFlux, WebClient, WebSocket, RSocket.
 Integration|Remoting, JMS, JCA, JMX, Email, Tasks, Scheduling, Caching.
 Languages|Kotlin, Groovy, Dynamic Languages.
 
+
+###打开方式
+idea import file build.gradle which in ./spring/  
+import as a geadle project
 
 ###SpringIOC
 > Inversion of Control(控制反转)  
