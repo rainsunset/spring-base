@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan("com.ligw.myioc")
 public class MainStart {
 	public static void main(String[] args) {
-		ApplicationContext context=new AnnotationConfigApplicationContext(MainStart.class);
+		ApplicationContext context = new AnnotationConfigApplicationContext(MainStart.class);
 		UserServiceImpl bean = context.getBean(UserServiceImpl.class);
 		bean.sayHi();
 	}

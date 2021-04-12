@@ -24,7 +24,13 @@ Languages|Kotlin, Groovy, Dynamic Languages.
 
 ###打开方式
 idea import file build.gradle which in ./spring/  
-import as a geadle project
+import as a geadle project  
+execute script test environment ok  
+```shell script
+# win
+gradlew :spring-oxm:compileTestJava
+```
+models which start with ligw- is spec Medel  
 
 ###SpringIOC
 > Inversion of Control(控制反转)  
