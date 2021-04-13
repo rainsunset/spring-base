@@ -84,7 +84,9 @@ public class AnnotatedBeanDefinitionReader {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		Assert.notNull(environment, "Environment must not be null");
 		this.registry = registry;
+		// 处理条件注解@Conditional
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
+		// 注册后置处理器
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 
@@ -249,17 +251,20 @@ public class AnnotatedBeanDefinitionReader {
 	private <T> void doRegisterBean(Class<T> beanClass, @Nullable String name,
 			@Nullable Class<? extends Annotation>[] qualifiers, @Nullable Supplier<T> supplier,
 			@Nullable BeanDefinitionCustomizer[] customizers) {
-
+		// 存储@Configuration注解注释的类
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
+		// 判断是否需要跳过注解，spring中有一个@Condition注解，当不满足条件，这个bean就不会被解析
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}
 
 		abd.setInstanceSupplier(supplier);
+		// 解析bean的作用域，如果没有设置的话，默认为单例
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
+		// 获取BeanName
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
-
+		// 解析通用注解，填充到AnnotatedGenericBeanDefinition，解析的注解为Lazy，Primary，DependsOn，Role，Description
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
@@ -279,9 +284,14 @@ public class AnnotatedBeanDefinitionReader {
 				customizer.customize(abd);
 			}
 		}
-
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		// this.registry Type= DefaultListableBeanFactory
+		// DefaultListableBeanFactory维护着一系列信息，比如beanDefinitionNames，beanDefinitionMap
+		// beanDefinitionNames是一个 ArrayList<String> (初始长度256),用来保存beanName
+		// beanDefinitionMap是一个ConcurrentHashMap<String, BeanDefinition>(初始长度256) ,用来保存beanName和beanDefinition
+		// DefaultListableBeanFactory.registerBeanDefinition(String beanName, BeanDefinition definitionHolder.getBeanDefinition());
+		// SimpleAliasRegistry.registerAlias(String beanName, String definitionHolder.getAliases()[i])
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

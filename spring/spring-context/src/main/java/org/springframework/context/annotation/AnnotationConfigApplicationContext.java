@@ -53,8 +53,14 @@ import org.springframework.util.Assert;
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
 
+	/**
+	 * 注解的Bean定义读取器
+	 */
 	private final AnnotatedBeanDefinitionReader reader;
 
+	/**
+	 * 类路径下的Bean定义扫描器
+	 */
 	private final ClassPathBeanDefinitionScanner scanner;
 
 
@@ -63,7 +69,13 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		// 创建一个读取注解的Bean定义读取器
+		// 完成了Spring内部BeanDefination(主要是后置处理器)的注册
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		// 创建BeanDefination扫描器,可以用来扫描包或者类
+		// spring默认的扫描包不是这个scanner
+		// spring再执行工程后置处理器ConfigurationClassPostProcessor，去扫描包时会new一个ClassPathBeanDefinitionScanner
+		// 这里的scanner仅仅时为了程序员可以手动调用AnnotationConfigApplicationContext的scan方法
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -84,8 +96,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		// 调用自身的午餐构造器前会先去调用父类的午餐构造器
+		// 调用(无参构造方法)初始化注解配置上下文
 		this();
+		// 注册(入参)配置类
 		register(componentClasses);
+		//
 		refresh();
 	}
 

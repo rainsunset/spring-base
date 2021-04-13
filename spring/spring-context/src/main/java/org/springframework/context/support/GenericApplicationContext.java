@@ -109,6 +109,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @see #refresh
 	 */
 	public GenericApplicationContext() {
+		// 为Spring上下文初始化BeanFactory
+		// 选择DefaultListableBeanFactory因为它是BeanFactory最底层的实现，实现或继承了很多BeanFactory，且实现了BeanDefinitionRegistry
+		// 功能强大且由注册Bean定义的能力
 		this.beanFactory = new DefaultListableBeanFactory();
 	}
 

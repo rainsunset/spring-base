@@ -91,29 +91,33 @@ BeanPostProcessor也是在ApplicationContext里注册的
 @AutoWired @Value AOP都是基于BeanPostProcessor来执行的  
 类注册成BeanDedination是通过BeanFactoryPostProcessor来实现解藕，动态可插拔  
 
+Spring上下文 ：AnnotarionConfigApplicationContext（配置类）  
+配置类配置扫包路径，注解。扫描到ioc容器里后就可以用getBean获取实例  
 
-编译源码：spring.io/projects/spribg-framework
-下载源码：官网、github：github.com/spring-projects/spring-framework    ,要选择tag，release版本的5.*.*
-笔记：spring最新源码编译.note
+**加载IOC容器常见的两种方法：**
+源码-用xml去加载上下文的方式-耦合  
+源码-配置类-用注解去加载上下文的方式-BeanFactoryPostProcessor  
+两者不同：将不同的上下文注册成BeanDefination的方法不一样  
 
-gradle：gradleWraper中的gradle
-修改镜像源为aliyun
-gradlew:spring-oxm:compileTestJava
+入口：spring上下文的构造方法: new AnnotationConfigApplicationContext(Class<?>... componentClasses) 
+0、调用构造器 this（）方法  
+a.  调用子类无参构造函数会先调用父类的构造函数GenericApplicationContext。
+父类构造函数实例化了一个BeanFactory：DefaultListableBeanFactory。
+它是BeanFactory的最底层实现，实现或者继承了很多BeanFactory功能强大，且实现了BeanDefinationRegistory，具有注册Bean定义的能力）  
+b. 自身实例化方法-创建一个读取注解的Bean定义reader:将AnnotatedBeanDefinationReader实例化。
+主要实现了注册注解配置的后置处理器（AnnotationConfigUtils.registerAnnotationConfigProcessors(BeanDefinitionRegistry this, null);）  
+- 为beanFactory注册实现了Order接口的排序器:AnnotationAwareOrderComparator.INSTANCE  
+- 为beanFactory注册Autowire的候选解析器 ContextAnnotationAutowireCandidateResolver  
+- 注册了很多的内置的后置处理器(只注册Bean定义)，如：  
+> ** internalAutowirteAutoWirteAnnotationProcessor ConfigurationClassPostProcessor.class 解析加了@Configuration的配置类和@ComponentScan、@componentScans注解配置的扫描包,解析@Import注解  
+> ** internalAutowiredAnnotationProcessor AutowiredAnnotationBeanPostProcessor.class 解析加了@Autowired、@Value的类  
+> (JSR-250 support) internalCommonAnnotationProcessor CommonAnnotationBeanPostProcessor.class 处理JSR规范  
+> (JPA support) internalPersistenceAnnotationProcessor PersistenceAnnotationBeanPostProcessor.class  
+> internalEventListenerProcessor EventListenerMethodProcessor.class 解析加了@EventListener的方法  
+> internalEventListenerFactory DefaultEventListenerFactory.class 注册事件监听器工厂  
 
-Spring上下文 ：AnnotarionConfigApplicationContext（配置类）
-配置类配置扫包路径，注解。扫描到ioc容器里后就可以用getBean获取实例
-
-加载IOC容器常见的两种方法：
-源码-用xml去加载上下文的方式-耦合
-源码-配置类-用注解去加载上下文的方式-BeanFactoryPostProcessor
-两者不同：将不同的上下文注册成BeanDefination的方法不一样
-
-入口：spring上下文的构造方法，
-0、调用构造器 this（）方法
-a.  调用子类无参构造函数会先调用父类的构造函数（idea查看类结构图快捷方式？）GenericApplicationContext。第一步就实例化了一个beanFactory：DefaultListableBeanFactory（这个factory实现了很多工厂的能力，且实现了BeanDefinationRegistory）。
-b. 自身实例化方法-创建一个读取注解的Bean定义reader:将AnnotatedBeanDefinationReader实例化：这个reader注册了很多的内置的后置处理器（registAnnatationConfigProcessors）如：处理@autowired的处理器 AutowiredAnnotationBeanPostProcesses（name：internalAutowirteAutoWirteAnnotationProcessor，这个处理器会解析加了@Autowired、@Value的类，事件）、处理配置类的后置处理器
-ConfigurationClsssPostProcess（名字：internalConfigurationAnnotationProcessor，这个处理器会解析加了@Configuration的配置类，解析@ComponentScan、@ComponentScans注解扫描的包，以及@Import @Bean）
-c. 自身实例化方法-创建BeanDefination扫描器：将ClsssPathBeanDefinitionScanner实例化。（但是spring默认的扫描包并不是这个scanner对象，而是自己new的一个classPathBeanDefinitionScanner，spring在执行ConfigurationClassPostProcessor时，去扫描包会new一个新的ClassPathBeanDedinationScanner；这里实例化的scanner仅仅是为了可以手动调用AnnotationConfigApplicationContext的scan方法），doscan方法。
+c. 自身实例化方法-创建BeanDefination扫描器：将ClsssPathBeanDefinitionScanner实例化。
+（但是spring默认的扫描包并不是这个scanner对象，而是自己new的一个classPathBeanDefinitionScanner，spring在执行ConfigurationClassPostProcessor时，去扫描包会new一个新的ClassPathBeanDedinationScanner；这里实例化的scanner仅仅是为了可以手动调用AnnotationConfigApplicationContext的scan方法），doscan方法。
 1、注册配置类：register（annotatenClass）
 reader读取配置类，注册成BeaDefination到beanDefinationMap里
 2、IOC容器刷新 refresh（13个方法）
