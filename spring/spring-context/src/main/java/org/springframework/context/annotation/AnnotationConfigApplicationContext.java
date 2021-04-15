@@ -99,7 +99,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		// 调用自身的午餐构造器前会先去调用父类的午餐构造器
 		// 调用(无参构造方法)初始化注解配置上下文
 		this();
-		// 注册(入参)配置类
+		// 注册配置类
 		register(componentClasses);
 		//
 		refresh();
